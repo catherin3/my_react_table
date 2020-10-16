@@ -1,13 +1,15 @@
 import React from 'react';
-import './App.css';
-import Table from './Component/Table';
+import './App.css'
+import { makeStyles} from '@material-ui/core';
+import { useTable } from 'react-table'
 
 function App() {
   return (
-    <div className="App">
-      <Table/>
+    <div>
+      
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
+
