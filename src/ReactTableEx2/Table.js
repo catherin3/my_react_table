@@ -1,5 +1,5 @@
 import React from 'react'
-import { useTable, useSortBy, usePagination } from 'react-table'
+import { useTable, usePagination, useSortBy } from 'react-table'
 import './table.css'
 
 const Table = ({ columns, data }) => {
@@ -25,28 +25,28 @@ const Table = ({ columns, data }) => {
         columns,
         data,
     },
-        useSortBy, usePagination
+         useSortBy, usePagination
     )
 
     const generateSortingIndicator = column => {
         return column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""
-    }
-    
+      }
+
     return (
         <>
             <table {...getTableProps()}>
                 <thead>
                     {headerGroups.map(headerGroup => (
                         <tr {...headerGroup.getHeaderGroupProps()}>
-                            {headerGroup.headers.map((column) => (
-                                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                                    {column.render('Header')}
-                                    {generateSortingIndicator(column)}
-                                </th>
+                            {headerGroup.headers.map(column => (
+                              <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                              {column.render("Header")}
+                              {generateSortingIndicator(column)}
+                            </th>
                             ))}
                         </tr>
                     ))}
-                </thead>
+                </thead>    
                 <tbody {...getTableBodyProps()}>
                     {page.map((row, i) => {
                         prepareRow(row)
@@ -60,7 +60,7 @@ const Table = ({ columns, data }) => {
                     })}
                 </tbody>
             </table>
-            <br/>
+            <br />
             <div className="pagination">
                 <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
                     {'<<'}

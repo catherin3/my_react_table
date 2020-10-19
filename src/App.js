@@ -32,11 +32,12 @@ const App = () => {
       {
         Header: "URL",
         accessor: "url",
-
+        disableSortBy: true
       },
       {
         Header: "Actions",
         id: 'delete',
+        disableSortBy: true,
         accessor: str => "delete",
         Cell: row => (
           <Button variant="contained" color="primary" >
