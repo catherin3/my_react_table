@@ -1,4 +1,5 @@
-import React, { useEffect, useState,useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { Button } from '@material-ui/core'
 import './App.css'
 import Table from './ReactTableEx2/Table'
 
@@ -26,18 +27,30 @@ const App = () => {
       {
         Header: "name",
         accessor: "name",
+
       },
       {
         Header: "URL",
         accessor: "url",
+
       },
-      
+      {
+        Header: "Actions",
+        id: 'delete',
+        accessor: str => "delete",
+        Cell: row => (
+          <Button variant="contained" color="primary" >
+            Delete
+          </Button>
+        )
+      },
+
     ],
     []
   )
 
 
-  return <div><Table columns={columns} data={data}/></div>
+  return <div><Table columns={columns} data={data} /></div>
 }
 
 export default App
