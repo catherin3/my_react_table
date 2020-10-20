@@ -1,5 +1,5 @@
 import React from 'react'
-import { useTable, usePagination, useRowSelect, useFilters, useGlobalFilter,useSortBy, } from 'react-table'
+import { useTable, usePagination, useRowSelect, useFilters, useGlobalFilter, useSortBy, useExpanded } from 'react-table'
 import { Checkbox } from '@material-ui/core'
 import { ColumnFilter } from './ColumnFilter'
 import './table.css'
@@ -22,7 +22,7 @@ const IndeterminateCheckbox = React.forwardRef(
 )
 
 
-const Table = ({ columns, data }) => {
+const Table = ({ columns: userColumns, data, renderRowSubComponent }) => {
 
     const defaultColumn = React.useMemo(
         () => ({
@@ -36,6 +36,7 @@ const Table = ({ columns, data }) => {
         getTableProps,
         getTableBodyProps,
         headerGroups,
+        footerGroups,
         prepareRow,
         page,
 
@@ -47,15 +48,18 @@ const Table = ({ columns, data }) => {
         nextPage,
         previousPage,
         setPageSize,
+        visibleColumns,
         state: { pageIndex, pageSize },
 
     } = useTable({
-        columns,
+        columns: userColumns,
         data,
         defaultColumn,
+
     },
         useFilters,
-        useGlobalFilter, useSortBy, usePagination,useRowSelect,
+        useGlobalFilter, useSortBy, useExpanded,
+        usePagination, useRowSelect,
         hooks => {
             hooks.visibleColumns.push(columns => [
                 // Let's make a column for selection
@@ -105,16 +109,48 @@ const Table = ({ columns, data }) => {
                 </thead>
                 <tbody {...getTableBodyProps()}>
                     {page.map((row, i) => {
-                        prepareRow(row)
+                        prepareRow(row);
                         return (
-                            <tr {...row.getRowProps()}>
-                                {row.cells.map(cell => {
-                                    return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                                })}
-                            </tr>
-                        )
+                            // Use a React.Fragment here so the table markup is still valid
+                            <React.Fragment key={i}>
+                                <tr {...row.getRowProps()}>
+                                    {row.cells.map((cell) => {
+                                        return (
+                                            <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                                        );
+                                    })}
+                                </tr>
+                                {/*
+                    If the row is in an expanded state, render a row with a
+                    column that fills the entire length of the table.
+                  */}
+                                {row.isExpanded ? (
+                                    <tr>
+                                        <td colSpan={visibleColumns.length}>
+                                            {/*
+                          Inside it, call our renderRowSubComponent function. In reality,
+                          you could pass whatever you want as props to
+                          a component like this, including the entire
+                          table instance. But for this example, we'll just
+                          pass the row
+                        */}
+                                            {renderRowSubComponent({ row })}
+                                        </td>
+                                    </tr>
+                                ) : null}
+                            </React.Fragment>
+                        );
                     })}
                 </tbody>
+                <tfoot>
+                    {footerGroups.map(group => (
+                        <tr {...group.getFooterGroupProps()}>
+                            {group.headers.map(column => (
+                                <td {...column.getFooterProps()}>{column.render('Footer')}</td>
+                            ))}
+                        </tr>
+                    ))}
+                </tfoot>
             </table>
             <br />
             <div className="pagination">

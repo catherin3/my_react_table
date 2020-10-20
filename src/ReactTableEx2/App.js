@@ -3,10 +3,10 @@ import { Button } from '@material-ui/core'
 import './App.css'
 import Table from './ReactTableEx2/Table'
 
+
 const App = () => {
 
   const [data, setData] = useState([])
-
   useEffect(() => {
     const doFetch = async () => {
       const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=807")
@@ -25,7 +25,7 @@ const App = () => {
       // {
       //   Header: "ID",
       //   Footer: "ID",
-      //   accessor: "id",
+      //   accessor: "tableData.id",
       //   disableSortBy: true
       // },
       {
@@ -57,7 +57,7 @@ const App = () => {
         Cell: row => (
           <>
             <Button variant="contained" color="primary" style={{ margin: 10 }}>EDIT</Button>
-            <Button variant="contained" color="primary" onClick={message}>
+            <Button variant="contained" color="primary" >
               DELETE
           </Button>
           </>
@@ -68,10 +68,6 @@ const App = () => {
     ],
     []
   )
-
-  const message = () => {
-    alert("DO you sure you want to delete it?")
-   }
 
   // Create a function that will render our row sub components
   const renderRowSubComponent = React.useCallback(
@@ -90,8 +86,7 @@ const App = () => {
 
 
   return (
-    <div> 
-      <Table
+    <div> <Table
       columns={columns}
       data={data}
       // We added this as a prop for our table component
