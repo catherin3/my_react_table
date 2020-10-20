@@ -27,7 +27,6 @@ const App = () => {
       {
         Header: "name",
         accessor: "name",
-
       },
       {
         Header: "URL",

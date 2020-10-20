@@ -1,8 +1,36 @@
 import React from 'react'
-import { useTable, usePagination, useSortBy } from 'react-table'
+import { useTable, usePagination, useRowSelect, useFilters, useGlobalFilter,useSortBy, } from 'react-table'
+import { Checkbox } from '@material-ui/core'
+import { ColumnFilter } from './ColumnFilter'
 import './table.css'
 
+const IndeterminateCheckbox = React.forwardRef(
+    ({ indeterminate, ...rest }, ref) => {
+        const defaultRef = React.useRef()
+        const resolvedRef = ref || defaultRef
+
+        React.useEffect(() => {
+            resolvedRef.current.indeterminate = indeterminate
+        }, [resolvedRef, indeterminate])
+
+        return (
+            <>
+                <Checkbox type="checkbox" ref={resolvedRef} {...rest} />
+            </>
+        )
+    }
+)
+
+
 const Table = ({ columns, data }) => {
+
+    const defaultColumn = React.useMemo(
+        () => ({
+            Filter: ColumnFilter
+        }),
+        []
+    )
+
 
     const {
         getTableProps,
@@ -24,13 +52,40 @@ const Table = ({ columns, data }) => {
     } = useTable({
         columns,
         data,
+        defaultColumn,
     },
-         useSortBy, usePagination
+        useFilters,
+        useGlobalFilter, useSortBy, usePagination,useRowSelect,
+        hooks => {
+            hooks.visibleColumns.push(columns => [
+                // Let's make a column for selection
+                {
+                    id: 'selection',
+                    // The header can use the table's getToggleAllRowsSelectedProps method
+                    // to render a checkbox
+                    Header: ({ getToggleAllPageRowsSelectedProps }) => (
+                        <div>
+                            <IndeterminateCheckbox {...getToggleAllPageRowsSelectedProps()} />
+                        </div>
+                    ),
+                    // The cell can use the individual row's getToggleRowSelectedProps method
+                    // to the render a checkbox
+                    Cell: ({ row }) => (
+                        <div>
+                            <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+                        </div>
+                    ),
+                },
+                ...columns,
+            ])
+        }
     )
+
+
 
     const generateSortingIndicator = column => {
         return column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""
-      }
+    }
 
     return (
         <>
@@ -39,14 +94,15 @@ const Table = ({ columns, data }) => {
                     {headerGroups.map(headerGroup => (
                         <tr {...headerGroup.getHeaderGroupProps()}>
                             {headerGroup.headers.map(column => (
-                              <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                              {column.render("Header")}
-                              {generateSortingIndicator(column)}
-                            </th>
+                                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                                    {column.render("Header")}
+                                    {generateSortingIndicator(column)}
+                                    <div>{column.canFilter ? column.render('Filter') : null}</div>
+                                </th>
                             ))}
                         </tr>
                     ))}
-                </thead>    
+                </thead>
                 <tbody {...getTableBodyProps()}>
                     {page.map((row, i) => {
                         prepareRow(row)
